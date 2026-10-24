@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: trust-vault
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT --workers 1 --timeout 120
+    healthCheckPath: /auth/login
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: TRUSTVAULT_ENV
+        value: production
+      - key: TRUSTVAULT_SECURE_COOKIE
+        value: "true"
+      - key: DATABASE_PATH
+        value: /var/data/trustvault.db
+      - key: STORAGE_FOLDER
+        value: /var/data/vault_storage
+      - key: SECRET_KEY
+        generateValue: true
+      - key: TRUSTVAULT_SEED_DEMO_ACCOUNTS
+        value: "false"
+    disk:
+      name: trust-vault-data
+      mountPath: /var/data
+      sizeGB: 1

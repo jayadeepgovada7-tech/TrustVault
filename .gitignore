@@ -1,0 +1,49 @@
+# Environment variables & secrets
+.env
+.env.*
+*.env
+secret_key*
+
+# Live database files (preserve schema.sql and seed scripts)
+*.db
+*.sqlite
+*.sqlite3
+trustvault.db
+
+# Uploaded files in vault storage (keep directory structure via .gitkeep)
+vault_storage/*
+!vault_storage/.gitkeep
+
+# Python cache & compiled bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testing & coverage caches
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+*.db
+*.sqlite
+*.sqlite3
+.env
+.venv/

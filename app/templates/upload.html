@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Document - Trust vault{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-3">
+            <a href="{{ url_for('documents.list_documents') }}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+            <h3 class="fw-bold mb-0">Upload Secure Document</h3>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <div class="alert alert-secondary d-flex align-items-center mb-4">
+                    <i class="bi bi-shield-check text-success fs-4 me-3"></i>
+                    <div class="small">
+                        <strong>Security Safeguards Enforced:</strong>
+                        <div>• Magic byte content inspection against disguised binaries.</div>
+                        <div>• Files stored in isolated storage directory with random cryptographically generated UUIDs.</div>
+                        <div>• Direct URL execution is physically blocked; downloads require dynamic authentication.</div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('documents.upload_document') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-semibold">Document Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required placeholder="e.g. Q4 Financial Strategy">
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="category" class="form-label fw-semibold">Category</label>
+                            <input type="text" class="form-control" id="category" name="category" list="categoryOptions" placeholder="e.g. Financial, HR, Legal">
+                            <datalist id="categoryOptions">
+                                <option value="Financial">
+                                <option value="Human Resources">
+                                <option value="Legal & Compliance">
+                                <option value="Engineering & Architecture">
+                                <option value="Security Audit">
+                                <option value="Confidential">
+                            </datalist>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tags" class="form-label fw-semibold">Tags (comma-separated)</label>
+                            <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g. 2026, audit, draft, executive">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-semibold">Description / Abstract</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief summary of document purpose and contents..."></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="file" class="form-label fw-semibold">Select File <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                        <div class="form-text text-muted small mt-2">
+                            Allowed types: <strong>.pdf, .png, .jpg, .jpeg, .txt, .csv, .docx, .xlsx</strong>. Max size: <strong>16 MB</strong>.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('documents.list_documents') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary fw-bold px-4">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Upload & Encrypt Metadata
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

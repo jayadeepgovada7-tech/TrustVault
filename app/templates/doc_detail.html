@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}{{ doc.title }} - Trust vault{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Document Information & Actions -->
+    <div class="col-lg-7">
+        <div class="d-flex align-items-center mb-3">
+            <a href="{{ url_for('documents.list_documents') }}" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Back to Documents
+            </a>
+            <h3 class="fw-bold mb-0 text-truncate">{{ doc.title }}</h3>
+        </div>
+
+        <!-- Document Details Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-secondary-subtle text-secondary me-2">{{ doc.category }}</span>
+                    {% if is_owner %}
+                        <span class="badge bg-primary"><i class="bi bi-star-fill me-1"></i> You are Owner</span>
+                    {% elif user_permission == 'edit' %}
+                        <span class="badge bg-success"><i class="bi bi-pencil me-1"></i> Granted Edit Access</span>
+                    {% elif user_permission == 'read' %}
+                        <span class="badge bg-info text-dark"><i class="bi bi-eye me-1"></i> Granted Read Access</span>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('documents.download_document', doc_id=doc.id) }}" class="btn btn-primary btn-sm fw-semibold shadow-sm">
+                    <i class="bi bi-download me-1"></i> Download File
+                </a>
+            </div>
+            
+            <div class="card-body">
+                <h5 class="fw-bold text-dark">Description</h5>
+                <p class="text-secondary">{{ doc.description or 'No description provided.' }}</p>
+
+                {% if doc.tags %}
+                    <div class="mb-3">
+                        <span class="fw-bold small text-muted d-block mb-1">Tags:</span>
+                        {% for tag in doc.tags.split(',') %}
+                            {% if tag.strip() %}
+                                <span class="badge bg-light text-dark border me-1">#{{ tag.strip() }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <hr class="text-muted">
+
+                <div class="row g-3 small">
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Original Filename:</span>
+                        <strong class="text-break">{{ doc.original_filename }}</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">MIME Type & Extension:</span>
+                        <strong>{{ doc.mime_type }} (.{{ doc.file_extension }})</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">File Size:</span>
+                        <strong>
+                            {% if doc.file_size > 1048576 %}
+                                {{ "%.2f"|format(doc.file_size / 1048576) }} MB
+                            {% else %}
+                                {{ "%.1f"|format(doc.file_size / 1024) }} KB
+                            {% endif %}
+                            ({{ doc.file_size }} bytes)
+                        </strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Document Owner:</span>
+                        <strong>{{ owner.username }} ({{ owner.email }})</strong>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Uploaded:</span>
+                        <span>{{ doc.created_at }}</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted d-block">Last Modified:</span>
+                        <span>{{ doc.updated_at }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Document Section (For Owner or Users with 'edit' permission) -->
+        {% if is_owner or user_permission == 'edit' %}
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-pencil-square text-success me-2"></i>Edit Document</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('documents.edit_document', doc_id=doc.id) }}" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label for="edit-title" class="form-label fw-semibold">Title</label>
+                            <input type="text" class="form-control" id="edit-title" name="title" value="{{ doc.title }}" required>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="edit-category" class="form-label fw-semibold">Category</label>
+                                <input type="text" class="form-control" id="edit-category" name="category" value="{{ doc.category }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit-tags" class="form-label fw-semibold">Tags</label>
+                                <input type="text" class="form-control" id="edit-tags" name="tags" value="{{ doc.tags }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit-description" class="form-label fw-semibold">Description</label>
+                            <textarea class="form-control" id="edit-description" name="description" rows="3">{{ doc.description }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="replacement_file" class="form-label fw-semibold">Replace File (Optional)</label>
+                            <input type="file" class="form-control" id="replacement_file" name="replacement_file">
+                            <div class="form-text small">Leave blank to keep existing file. If replaced, old file is securely wiped.</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-success fw-semibold">
+                                <i class="bi bi-check-lg me-1"></i> Save Changes
+                            </button>
+                            
+                            {% if is_owner %}
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteDocModal">
+                                    <i class="bi bi-trash me-1"></i> Delete Document
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Access Control & Permissions Management -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-0">
+                <h5 class="fw-bold mb-0 text-dark">
+                    <i class="bi bi-person-check text-primary me-2"></i>Access & Permissions
+                </h5>
+                <p class="text-muted small mb-0">Fine-grained per-document named user authorization</p>
+            </div>
+
+            <div class="card-body">
+                {% if is_owner %}
+                    <!-- Grant Permission Form -->
+                    <div class="p-3 bg-light rounded-3 mb-4 border">
+                        <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-person-plus text-primary me-1"></i> Grant Access to User</h6>
+                        
+                        {% if available_users %}
+                            <form method="POST" action="{{ url_for('documents.grant_permission', doc_id=doc.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                <div class="mb-2">
+                                    <label class="form-label small fw-semibold">Select Named User:</label>
+                                    <select name="user_id" class="form-select form-select-sm" required>
+                                        <option value="">-- Choose User --</option>
+                                        {% for u in available_users %}
+                                            <option value="{{ u.id }}">{{ u.username }} ({{ u.email }}) - {{ u.role }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Permission Level:</label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="permission_level" id="permRead" value="read" checked>
+                                            <label class="form-check-label small" for="permRead">
+                                                <strong>Read Only</strong> (View & Download)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="permission_level" id="permEdit" value="edit">
+                                            <label class="form-check-label small" for="permEdit">
+                                                <strong>Edit</strong> (Read, Download, Edit)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
+                                    <i class="bi bi-shield-plus me-1"></i> Authorize User
+                                </button>
+                            </form>
+                        {% else %}
+                            <p class="small text-muted mb-0">All active users currently hold access to this document.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Current Permissions Table -->
+                    <h6 class="fw-bold mb-2 text-dark">Active Grants ({{ granted_permissions|length }})</h6>
+                    {% if granted_permissions %}
+                        <div class="list-group list-group-flush border rounded">
+                            {% for perm in granted_permissions %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                                    <div>
+                                        <div class="fw-semibold small">{{ perm.username }}</div>
+                                        <div class="text-muted small" style="font-size: 0.75rem;">{{ perm.email }}</div>
+                                        <span class="badge {% if perm.permission_level == 'edit' %}bg-success{% else %}bg-info text-dark{% endif %} small">
+                                            {{ perm.permission_level|upper }}
+                                        </span>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('documents.revoke_permission', doc_id=doc.id) }}" class="ms-2">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="target_user_id" value="{{ perm.user_id }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Revoke Permission Immediately">
+                                            <i class="bi bi-x-circle me-1"></i> Revoke
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-muted small text-center py-3 bg-light rounded border">
+                            <i class="bi bi-shield-lock me-1"></i> No other users have been granted permission yet. Only you (the owner) have access.
+                        </div>
+                    {% endif %}
+
+                {% else %}
+                    <!-- Non-owners view of permissions -->
+                    <div class="alert alert-light border">
+                        <h6 class="fw-bold"><i class="bi bi-shield-check text-primary me-1"></i> Your Authorization</h6>
+                        <p class="small text-muted mb-2">You are accessing this document via granted permissions:</p>
+                        <div class="p-2 bg-white rounded border">
+                            <span class="badge {% if user_permission == 'edit' %}bg-success{% else %}bg-info text-dark{% endif %} text-uppercase">
+                                {{ user_permission }}
+                            </span>
+                            <span class="small text-muted ms-2">
+                                {% if user_permission == 'edit' %}
+                                    You have permission to view, download, and edit metadata/files.
+                                {% elif user_permission == 'read' %}
+                                    You have read-only access to view metadata and download the file.
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="mt-3 small text-muted">
+                            <i class="bi bi-info-circle me-1"></i> Only the document owner (<strong>{{ owner.username }}</strong>) can modify permissions or delete this document.
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal (Owner Only) -->
+{% if is_owner %}
+<div class="modal fade" id="deleteDocModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Document Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete <strong>"{{ doc.title }}"</strong>?</p>
+                <div class="alert alert-warning small">
+                    This will permanently delete the file from secure storage and revoke all permissions granted to other users. This action is irreversible and recorded in the audit log.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('documents.delete_document', doc_id=doc.id) }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-danger fw-bold">
+                        <i class="bi bi-trash-fill me-1"></i> Permanently Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

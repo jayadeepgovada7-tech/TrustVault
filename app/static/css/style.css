@@ -1,0 +1,339 @@
+/* =====================================================================
+   Trust vault — Theme System
+   Light / Dark / System via CSS variables on [data-bs-theme]
+   ===================================================================== */
+
+/* ---------- Light theme tokens (default) ---------- */
+:root,
+[data-bs-theme="light"] {
+    --tv-primary:            #0d6efd;
+    --tv-bg:                 #f8fafc;
+    --tv-surface:            #ffffff;
+    --tv-surface-2:          #f1f5f9;
+    --tv-border:             #e2e8f0;
+    --tv-text:               #1e293b;
+    --tv-text-muted:         #64748b;
+    --tv-nav-bg:             #0f172a;
+    --tv-nav-text:           #f8fafc;
+    --tv-footer-bg:          #ffffff;
+    --tv-footer-border:      #e2e8f0;
+    --tv-footer-text:        #64748b;
+    --tv-code-bg:            #f1f5f9;
+    --tv-code-text:          #0f172a;
+    --tv-card-shadow:        0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    --tv-table-header-bg:    #f1f5f9;
+    --tv-table-header-text:  #64748b;
+    --tv-input-bg:           #ffffff;
+    --tv-input-border:       #cbd5e1;
+    --tv-toggle-btn-bg:      rgba(255,255,255,.12);
+    --tv-toggle-btn-hover:   rgba(255,255,255,.22);
+}
+
+/* ---------- Dark theme tokens ---------- */
+[data-bs-theme="dark"] {
+    --tv-bg:                 #0f172a;
+    --tv-surface:            #1e293b;
+    --tv-surface-2:          #273548;
+    --tv-border:             #334155;
+    --tv-text:               #e2e8f0;
+    --tv-text-muted:         #94a3b8;
+    --tv-nav-bg:             #020617;
+    --tv-nav-text:           #e2e8f0;
+    --tv-footer-bg:          #1e293b;
+    --tv-footer-border:      #334155;
+    --tv-footer-text:        #94a3b8;
+    --tv-code-bg:            #273548;
+    --tv-code-text:          #93c5fd;
+    --tv-card-shadow:        0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+    --tv-table-header-bg:    #273548;
+    --tv-table-header-text:  #94a3b8;
+    --tv-input-bg:           #1e293b;
+    --tv-input-border:       #475569;
+    --tv-toggle-btn-bg:      rgba(255,255,255,.10);
+    --tv-toggle-btn-hover:   rgba(255,255,255,.20);
+}
+
+/* =====================================================================
+   Base Layout
+   ===================================================================== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--tv-bg);
+    color: var(--tv-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background-color .2s, color .2s;
+}
+
+main { flex: 1; }
+
+/* =====================================================================
+   Navbar
+   ===================================================================== */
+.navbar {
+    background-color: var(--tv-nav-bg) !important;
+}
+
+.navbar-brand {
+    letter-spacing: -0.5px;
+    color: var(--tv-nav-text) !important;
+}
+
+/* =====================================================================
+   Theme Toggle Button (in navbar)
+   ===================================================================== */
+.theme-toggle-btn {
+    background: var(--tv-toggle-btn-bg);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: .8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background .15s;
+    white-space: nowrap;
+}
+.theme-toggle-btn:hover {
+    background: var(--tv-toggle-btn-hover);
+    color: #fff;
+}
+.theme-toggle-btn i { font-size: .95rem; }
+
+/* Active option highlight inside dropdown */
+.theme-menu .dropdown-item.active,
+.theme-menu .dropdown-item:active {
+    background-color: var(--tv-primary);
+    color: #fff;
+}
+
+/* =====================================================================
+   Cards
+   ===================================================================== */
+.card {
+    background-color: var(--tv-surface);
+    border-color: var(--tv-border) !important;
+    box-shadow: var(--tv-card-shadow);
+    transition: transform .15s ease-in-out, box-shadow .15s ease-in-out,
+                background-color .2s;
+}
+
+.card-header {
+    background-color: var(--tv-surface-2) !important;
+    border-color: var(--tv-border) !important;
+    color: var(--tv-text);
+}
+
+/* Login / Register card header stays dark in both themes for contrast */
+.card-header.bg-dark {
+    background-color: var(--tv-nav-bg) !important;
+    color: #e2e8f0 !important;
+}
+
+/* =====================================================================
+   Tables
+   ===================================================================== */
+.table {
+    --bs-table-bg: var(--tv-surface);
+    --bs-table-color: var(--tv-text);
+    --bs-table-border-color: var(--tv-border);
+    --bs-table-striped-bg: var(--tv-surface-2);
+    --bs-table-hover-bg: var(--tv-surface-2);
+}
+
+.table th {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--tv-table-header-text);
+    background-color: var(--tv-table-header-bg);
+    border-color: var(--tv-border) !important;
+}
+
+.table td {
+    border-color: var(--tv-border) !important;
+    color: var(--tv-text);
+}
+
+.table-light {
+    --bs-table-bg: var(--tv-table-header-bg);
+    --bs-table-color: var(--tv-table-header-text);
+}
+
+/* =====================================================================
+   Forms & Inputs
+   ===================================================================== */
+.form-control,
+.form-select,
+.input-group-text {
+    background-color: var(--tv-input-bg);
+    border-color: var(--tv-input-border);
+    color: var(--tv-text);
+    transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--tv-input-bg);
+    color: var(--tv-text);
+    border-color: var(--tv-primary);
+    box-shadow: 0 0 0 .2rem rgba(13,110,253,.25);
+}
+
+.form-control::placeholder { color: var(--tv-text-muted); }
+.form-text { color: var(--tv-text-muted) !important; }
+
+/* =====================================================================
+   Footer
+   ===================================================================== */
+footer {
+    background-color: var(--tv-footer-bg) !important;
+    border-color: var(--tv-footer-border) !important;
+    color: var(--tv-footer-text) !important;
+    transition: background-color .2s;
+}
+
+footer span { color: var(--tv-footer-text); }
+
+/* =====================================================================
+   Alerts — ensure readable in dark mode
+   ===================================================================== */
+.alert-secondary {
+    background-color: var(--tv-surface-2);
+    border-color: var(--tv-border);
+    color: var(--tv-text);
+}
+
+/* =====================================================================
+   Misc helpers
+   ===================================================================== */
+.file-icon-box {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+code {
+    color: var(--tv-code-text);
+    background-color: var(--tv-code-bg);
+    padding: .15rem .35rem;
+    border-radius: 4px;
+}
+
+.badge { font-weight: 500; }
+
+/* Text-color helpers respect theme */
+.text-dark   { color: var(--tv-text) !important; }
+.text-muted  { color: var(--tv-text-muted) !important; }
+
+/* Dashboard document title link readable in both themes */
+.table a.fw-bold { color: var(--tv-primary); }
+.table a.fw-bold:hover { color: var(--tv-primary); text-decoration: underline; }
+
+/* Subtle badge backgrounds respect dark mode */
+[data-bs-theme="dark"] .bg-light { background-color: var(--tv-surface-2) !important; }
+[data-bs-theme="dark"] .bg-white { background-color: var(--tv-surface) !important; }
+[data-bs-theme="dark"] .border-top { border-color: var(--tv-border) !important; }
+[data-bs-theme="dark"] .border-bottom { border-color: var(--tv-border) !important; }
+
+/* =====================================================================
+   Professional UI refinement — consistent spacing, focus, responsiveness
+   ===================================================================== */
+:root,
+[data-bs-theme="light"] {
+    --tv-primary: #2457d6;
+    --tv-primary-hover: #1946b8;
+    --tv-bg: #f4f7fb;
+    --tv-surface: #ffffff;
+    --tv-surface-2: #f6f8fc;
+    --tv-border: #e4eaf2;
+    --tv-text: #182338;
+    --tv-text-muted: #64748b;
+    --tv-nav-bg: #111c31;
+    --tv-card-shadow: 0 8px 24px rgba(15, 23, 42, .045);
+}
+
+[data-bs-theme="dark"] {
+    --tv-primary: #7aa2ff;
+    --tv-primary-hover: #9ab7ff;
+    --tv-bg: #0b1220;
+    --tv-surface: #121d2e;
+    --tv-surface-2: #1a2940;
+    --tv-border: #2a3a52;
+    --tv-text: #e8eef8;
+    --tv-text-muted: #a1aec2;
+    --tv-nav-bg: #070d18;
+    --tv-card-shadow: 0 8px 24px rgba(0, 0, 0, .16);
+}
+
+html { scroll-behavior: smooth; }
+body { line-height: 1.55; letter-spacing: .005em; }
+main.container-fluid { max-width: 1600px; width: 100%; margin-inline: auto; padding-inline: clamp(1rem, 2.5vw, 2.25rem) !important; }
+.navbar { padding-block: .8rem; border-bottom: 1px solid rgba(148, 163, 184, .14); }
+.navbar-brand { font-size: 1.12rem; letter-spacing: -.035em; }
+.navbar-brand .badge { font-size: .62rem !important; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.navbar .nav-link { border-radius: .55rem; padding: .55rem .8rem !important; color: #c8d3e4; transition: background-color .18s ease, color .18s ease; }
+.navbar .nav-link:hover, .navbar .nav-link:focus-visible { background: rgba(255,255,255,.08); color: #fff; }
+.navbar .nav-link.text-warning { color: #f5c86b !important; }
+.theme-toggle-btn { min-height: 36px; padding: .42rem .7rem; border-radius: .6rem; }
+
+h1, h2, h3, h4, h5, h6 { color: var(--tv-text); letter-spacing: -.025em; }
+h2 { font-size: clamp(1.4rem, 2.2vw, 1.9rem); }
+p { color: inherit; }
+.card { border: 1px solid var(--tv-border) !important; border-radius: 1rem; overflow: hidden; box-shadow: var(--tv-card-shadow); }
+.card-header { padding: 1rem 1.25rem; }
+.card-body { padding: clamp(1rem, 2vw, 1.5rem); }
+.btn { border-radius: .65rem; font-weight: 600; transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { --bs-btn-bg: #2457d6; --bs-btn-border-color: #2457d6; --bs-btn-hover-bg: #1946b8; --bs-btn-hover-border-color: #1946b8; --bs-btn-active-bg: #1946b8; --bs-btn-active-border-color: #1946b8; }
+[data-bs-theme="dark"] .btn-primary { --bs-btn-color: #07101f; --bs-btn-bg: #8aabff; --bs-btn-border-color: #8aabff; --bs-btn-hover-bg: #a7beff; --bs-btn-hover-border-color: #a7beff; --bs-btn-active-bg: #a7beff; --bs-btn-active-border-color: #a7beff; }
+.btn:focus-visible, .form-control:focus-visible, .form-select:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid rgba(74, 125, 255, .55); outline-offset: 2px; }
+.form-control, .form-select, .input-group-text { min-height: 42px; border-radius: .6rem; }
+.input-group > .input-group-text { border-radius: .6rem 0 0 .6rem; }
+.input-group > .form-control, .input-group > .form-select { border-radius: 0 .6rem .6rem 0; }
+.form-control:focus, .form-select:focus { box-shadow: 0 0 0 .22rem rgba(36, 87, 214, .14); }
+.table-responsive { border-radius: 0 0 1rem 1rem; }
+.table { margin-bottom: 0; }
+.table th { padding: .9rem 1rem; font-size: .72rem; letter-spacing: .075em; }
+.table td { padding: .95rem 1rem; }
+.table tbody tr { transition: background-color .15s ease; }
+.table a { text-decoration: none; }
+.table a:hover { text-decoration: underline; }
+.file-icon-box { flex: 0 0 48px; border: 1px solid rgba(148,163,184,.12); }
+.badge { border-radius: .45rem; padding: .4em .65em; letter-spacing: .015em; }
+.alert { border-radius: .8rem; border-width: 1px; padding: .9rem 1rem; }
+.dropdown-menu { border: 1px solid var(--tv-border); border-radius: .8rem; box-shadow: 0 14px 35px rgba(15,23,42,.14); padding: .4rem; }
+.dropdown-item { border-radius: .45rem; padding: .55rem .75rem; }
+footer { margin-top: 2rem; padding-block: 1.1rem !important; }
+footer span { font-size: .76rem; letter-spacing: .01em; }
+.text-muted, .text-secondary { color: var(--tv-text-muted) !important; }
+.text-dark { color: var(--tv-text) !important; }
+.bg-white { background-color: var(--tv-surface) !important; }
+.input-group-text.bg-white { background-color: var(--tv-surface) !important; color: var(--tv-text-muted) !important; }
+
+[data-bs-theme="dark"] .text-primary { color: #8aabff !important; }
+[data-bs-theme="dark"] .table a.fw-bold { color: #9ab7ff; }
+[data-bs-theme="dark"] .btn-outline-secondary { --bs-btn-color: #cbd5e1; --bs-btn-border-color: #52627a; --bs-btn-hover-bg: #27364d; --bs-btn-hover-color: #fff; }
+[data-bs-theme="dark"] .btn-outline-light { --bs-btn-color: #e2e8f0; --bs-btn-border-color: #52627a; --bs-btn-hover-bg: #27364d; }
+[data-bs-theme="dark"] .bg-primary-subtle { background-color: #20345c !important; }
+[data-bs-theme="dark"] .text-primary-emphasis { color: #b9ccff !important; }
+
+@media (max-width: 767.98px) {
+    main.container-fluid { padding-top: 1.25rem !important; }
+    .navbar .navbar-nav { align-items: stretch !important; }
+    .navbar .nav-item.text-light { padding: .55rem .25rem; }
+    .navbar .theme-toggle-btn { margin-block: .35rem; }
+    .table th, .table td { padding: .75rem .7rem; }
+    .card { border-radius: .8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
