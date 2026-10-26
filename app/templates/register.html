@@ -1,76 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Trust vault{% endblock %}
+{% block title %}Create Account - TrustVault{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center pt-3">
-    <div class="col-md-7 col-lg-6">
-        <div class="card border-0 shadow-lg rounded-4">
-            <div class="card-header bg-dark text-white text-center py-4 rounded-top-4 border-0">
-                <i class="bi bi-person-badge text-primary display-5 mb-2"></i>
-                <h3 class="fw-bold mb-0">Create Your Account</h3>
-                <p class="text-muted small mb-0">Join Trust vault with Role-Based Separation</p>
-            </div>
-            <div class="card-body p-4 p-md-5">
-                <form method="POST" action="{{ url_for('auth.register') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                    <div class="mb-3">
-                        <label for="username" class="form-label fw-semibold">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control" id="username" name="username" required placeholder="e.g. john_doe">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label fw-semibold">Email Address</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                            <input type="email" class="form-control" id="email" name="email" required placeholder="john@example.com">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="role" class="form-label fw-semibold">Requested Role</label>
-                        <select class="form-select" id="role" name="role" required>
-                            <option value="document_owner" selected>Document Owner (Can upload, manage, grant/revoke permissions)</option>
-                            <option value="viewer">Viewer (Can search and view shared documents only)</option>
-                        </select>
-                        <div class="form-text text-muted small">
-                            <i class="bi bi-info-circle"></i> Administrator accounts cannot be self-registered and require pre-provisioned administrative authority.
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label fw-semibold">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-key"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required placeholder="••••••••">
-                        </div>
-                        <div class="form-text text-muted small">
-                            Must be at least 8 characters, containing uppercase, lowercase, number, and special character.
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="confirm_password" class="form-label fw-semibold">Confirm Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="••••••••">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
-                        <i class="bi bi-check2-circle me-1"></i> Register Account
-                    </button>
-                </form>
-
-                <div class="mt-4 pt-3 border-top text-center">
-                    <p class="small text-muted mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="fw-semibold">Sign in</a></p>
-                </div>
-            </div>
-        </div>
+<section class="royal-login-shell royal-register-shell">
+  <div class="royal-login-card royal-register-card">
+    <aside class="royal-login-brand-panel">
+      <div class="royal-emblem"><i class="bi bi-shield-lock-fill"></i></div>
+      <p class="royal-eyebrow">PRIVATE • VERIFIED • PROTECTED</p>
+      <h1>Trust<span>Vault</span></h1>
+      <div class="royal-divider"><span></span><i class="bi bi-gem"></i><span></span></div>
+      <p class="royal-brand-copy">Create your secure space for the documents that matter.</p>
+      <div class="royal-security-note"><i class="bi bi-shield-check"></i><span>Your privacy starts here</span></div>
+    </aside>
+    <div class="royal-login-form-panel royal-register-form-panel">
+      <div class="royal-form-heading">
+        <span class="royal-kicker">JOIN TRUSTVAULT</span>
+        <h2>Create your account</h2>
+        <p>Set up your secure document vault in a few steps.</p>
+      </div>
+      <form method="POST" action="{{ url_for('auth.register') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3 royal-field"><label for="username" class="form-label">Username</label><div class="input-group royal-input-group"><span class="input-group-text"><i class="bi bi-person"></i></span><input type="text" class="form-control" id="username" name="username" required autocomplete="username" placeholder="Choose a username"></div></div>
+        <div class="mb-3 royal-field"><label for="email" class="form-label">Email address</label><div class="input-group royal-input-group"><span class="input-group-text"><i class="bi bi-envelope"></i></span><input type="email" class="form-control" id="email" name="email" required autocomplete="email" placeholder="name@example.com"></div></div>
+        <div class="mb-3 royal-field"><label for="role" class="form-label">Account type</label><select class="form-select royal-select" id="role" name="role" required><option value="document_owner" selected>Document Owner</option><option value="viewer">Viewer</option></select><div class="royal-help"><i class="bi bi-info-circle"></i> Administrator accounts require pre-provisioned authority.</div></div>
+        <div class="mb-3 royal-field"><label for="password" class="form-label">Password</label><div class="input-group royal-input-group"><span class="input-group-text"><i class="bi bi-key"></i></span><input type="password" class="form-control" id="password" name="password" required autocomplete="new-password" placeholder="Create a strong password"></div><div class="royal-help">At least 8 characters, with uppercase, lowercase, number, and special character.</div></div>
+        <div class="mb-4 royal-field"><label for="confirm_password" class="form-label">Confirm password</label><div class="input-group royal-input-group"><span class="input-group-text"><i class="bi bi-key-fill"></i></span><input type="password" class="form-control" id="confirm_password" name="confirm_password" required autocomplete="new-password" placeholder="Enter password again"></div></div>
+        <button type="submit" class="btn royal-signin-btn w-100"><span>Create secure account</span><i class="bi bi-arrow-right-short fs-4"></i></button>
+      </form>
+      <div class="royal-form-footer">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a></div>
+      <div class="royal-encryption"><i class="bi bi-lock-fill"></i> Protected with secure, verified access</div>
     </div>
-</div>
+  </div>
+</section>
 {% endblock %}

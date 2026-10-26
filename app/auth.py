@@ -1,6 +1,9 @@
 import functools
 import re
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort
+import os, smtplib, secrets
+from email.message import EmailMessage
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort, current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.database import get_db
 from app.audit import log_audit
@@ -236,3 +239,113 @@ def register():
         return redirect(url_for('auth.login'))
 
     return render_template('register.html')
+
+# Password recovery email: configure SMTP_HOST, SMTP_PORT, SMTP_USERNAME,
+# SMTP_PASSWORD and SMTP_FROM in the deployment environment.
+def _reset_serializer():
+    return URLSafeTimedSerializer(current_app.config['SECRET_KEY'], salt='trustvault-password-reset-v1')
+
+def _send_reset_email(recipient, link):
+    host = os.environ.get('SMTP_HOST')
+    sender = os.environ.get('SMTP_FROM', os.environ.get('SMTP_USERNAME', ''))
+    if not host or not sender:
+        return False
+    msg = EmailMessage()
+    msg['Subject'] = 'Reset your TrustVault password'
+    msg['From'] = sender
+    msg['To'] = recipient
+    msg.set_content('We received a request to reset your TrustVault password.\n\nThis link expires in 30 minutes:\n' + link + '\n\nIf you did not request this, ignore this email.')
+    with smtplib.SMTP(host, int(os.environ.get('SMTP_PORT', '587')), timeout=15) as server:
+        server.starttls()
+        username, password = os.environ.get('SMTP_USERNAME'), os.environ.get('SMTP_PASSWORD')
+        if username and password:
+            server.login(username, password)
+        server.send_message(msg)
+    return True
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        cursor = get_db().cursor()
+        cursor.execute('SELECT id, email FROM users WHERE email = ?', (email,))
+        user = cursor.fetchone() if email else None
+        if user:
+            token = _reset_serializer().dumps({'uid': user['id'], 'nonce': secrets.token_urlsafe(16)})
+            link = url_for('auth.reset_password', token=token, _external=True)
+            try:
+                if not _send_reset_email(user['email'], link) and os.environ.get('TRUSTVAULT_SHOW_RESET_LINK', '').lower() == 'true':
+                    current_app.logger.warning('Development reset link: %s', link)
+            except Exception:
+                current_app.logger.exception('Password reset email delivery failed')
+        flash('If that email is registered, a password reset link will be sent shortly.', 'info')
+        return redirect(url_for('auth.forgot_password'))
+    return render_template('forgot_password.html')
+
+@auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    try:
+        data = _reset_serializer().loads(token, max_age=1800)
+        user_id = int(data['uid'])
+    except (BadSignature, SignatureExpired, KeyError, TypeError, ValueError):
+        flash('This password reset link is invalid or expired. Please request a new one.', 'danger')
+        return redirect(url_for('auth.forgot_password'))
+    if request.method == 'POST':
+        password, confirm = request.form.get('password', ''), request.form.get('confirm_password', '')
+        strong, message = validate_password_strength(password)
+        if password != confirm:
+            flash('Passwords do not match.', 'danger')
+        elif not strong:
+            flash(message, 'danger')
+        else:
+            conn = get_db(); cursor = conn.cursor()
+            cursor.execute('UPDATE users SET password_hash = ? WHERE id = ?', (generate_password_hash(password, method='scrypt'), user_id))
+            conn.commit()
+            if cursor.rowcount:
+                log_audit(action='AUTH_PASSWORD_RESET', status='SUCCESS', resource='/auth/reset-password', user_id=user_id, details='Password reset completed')
+                flash('Password reset successfully. Please sign in with your new password.', 'success')
+                return redirect(url_for('auth.login'))
+            flash('Account not found. Please request a new reset link.', 'danger')
+            return redirect(url_for('auth.forgot_password'))
+    return render_template('reset_password.html')
+
+@auth_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    conn = get_db(); cursor = conn.cursor()
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        if not username or len(username) > 80:
+            flash('Enter a username between 1 and 80 characters.', 'danger')
+        else:
+            cursor.execute('SELECT id FROM users WHERE username = ? AND id != ?', (username, session['user_id']))
+            if cursor.fetchone():
+                flash('That username is already in use.', 'danger')
+            else:
+                cursor.execute('UPDATE users SET username = ? WHERE id = ?', (username, session['user_id']))
+                conn.commit(); session['username'] = username
+                flash('Profile updated successfully.', 'success')
+                return redirect(url_for('auth.profile'))
+    cursor.execute('SELECT id, email, username, role, created_at, is_active FROM users WHERE id = ?', (session['user_id'],))
+    return render_template('profile.html', user=cursor.fetchone())
+
+@auth_bp.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    if request.method == 'POST':
+        current, new, confirm = request.form.get('current_password', ''), request.form.get('new_password', ''), request.form.get('confirm_password', '')
+        cursor = get_db().cursor(); cursor.execute('SELECT password_hash FROM users WHERE id = ?', (session['user_id'],)); user = cursor.fetchone()
+        if not user or not check_password_hash(user['password_hash'], current):
+            flash('Current password is incorrect.', 'danger')
+        elif new != confirm:
+            flash('New passwords do not match.', 'danger')
+        else:
+            strong, message = validate_password_strength(new)
+            if not strong:
+                flash(message, 'danger')
+            else:
+                conn = get_db(); conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (generate_password_hash(new, method='scrypt'), session['user_id'])); conn.commit()
+                log_audit(action='AUTH_PASSWORD_CHANGE', status='SUCCESS', resource='/auth/settings', user_id=session['user_id'], details='Password changed in settings')
+                flash('Password changed successfully.', 'success')
+                return redirect(url_for('auth.settings'))
+    return render_template('settings.html')

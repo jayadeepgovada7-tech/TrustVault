@@ -6,7 +6,7 @@
     'use strict';
 
     // ── Theme constants ──────────────────────────────────────────────────────
-    var STORAGE_KEY = 'tv_theme';   // 'light' | 'dark' | 'system'
+    var STORAGE_KEY = 'tv_theme';   // 'light' | 'dark'
     var HTML_EL     = document.documentElement;
 
     /**
@@ -14,11 +14,7 @@
      * stored preference. 'system' follows window.matchMedia.
      */
     function resolveTheme(pref) {
-        if (pref === 'dark')  return 'dark';
-        if (pref === 'light') return 'light';
-        // 'system' or anything else
-        return window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark' : 'light';
+        return pref === 'dark' ? 'dark' : 'light';
     }
 
     /** Apply the theme to <html> and sync the toggle UI. */
@@ -31,18 +27,18 @@
 
     /** Update the navbar toggle label and check-marks. */
     function syncToggleUI(pref) {
-        var labels = { light: 'Light', dark: 'Dark', system: 'System' };
-        var icons  = { light: 'bi-sun-fill', dark: 'bi-moon-fill', system: 'bi-circle-half' };
+        var labels = { light: 'Light', dark: 'Dark' };
+        var icons  = { light: 'bi-sun-fill', dark: 'bi-moon-fill' };
 
         var btn = document.getElementById('tv-theme-btn');
         if (btn) {
             var iconEl = btn.querySelector('i');
             if (iconEl) {
-                iconEl.className = 'bi ' + (icons[pref] || 'bi-circle-half');
+                iconEl.className = 'bi ' + (icons[pref] || icons.light);
             }
             var labelEl = btn.querySelector('.tv-theme-label');
             if (labelEl) {
-                labelEl.textContent = labels[pref] || 'System';
+                labelEl.textContent = labels[pref] || 'Light';
             }
         }
 
@@ -60,24 +56,17 @@
     document.addEventListener('DOMContentLoaded', function () {
 
         // Theme menu items
-        document.querySelectorAll('.theme-menu .dropdown-item').forEach(function (el) {
-            el.addEventListener('click', function (e) {
-                e.preventDefault();
-                applyTheme(this.dataset.theme);
+        var themeButton = document.getElementById('tv-theme-btn');
+        if (themeButton) {
+            themeButton.addEventListener('click', function () {
+                var current = localStorage.getItem(STORAGE_KEY) || 'light';
+                applyTheme(current === 'dark' ? 'light' : 'dark');
             });
-        });
+        }
 
-        // Sync UI on load (theme is already applied; just update the indicator)
-        var stored = localStorage.getItem(STORAGE_KEY) || 'system';
-        syncToggleUI(stored);
-
-        // ── OS preference listener (for 'system' mode) ───────────────────────
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-            var current = localStorage.getItem(STORAGE_KEY) || 'system';
-            if (current === 'system') {
-                applyTheme('system');
-            }
-        });
+        // Sync UI on load; theme preference is saved across visits.
+        var stored = localStorage.getItem(STORAGE_KEY) || 'light';
+        applyTheme(stored);
 
         // ── Auto-dismiss flash alerts after 6 seconds ────────────────────────
         setTimeout(function () {

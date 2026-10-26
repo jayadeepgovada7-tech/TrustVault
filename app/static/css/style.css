@@ -337,3 +337,70 @@ footer span { font-size: .76rem; letter-spacing: .01em; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+
+/* Royal login interface: midnight navy, imperial purple and champagne gold */
+.royal-login-shell { min-height: min(760px, calc(100vh - 190px)); display:flex; align-items:center; justify-content:center; padding:clamp(.25rem, 2.5vw, 2rem) 0; }
+.royal-login-card { width:min(100%, 1000px); display:grid; grid-template-columns: .92fr 1.08fr; overflow:hidden; border:1px solid rgba(205,170,95,.38); border-radius:24px; background:var(--tv-surface); box-shadow:0 28px 80px rgba(15,12,35,.18); animation:royal-rise .65s cubic-bezier(.2,.7,.2,1) both; }
+.royal-login-brand-panel { position:relative; isolation:isolate; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:clamp(2rem, 5vw, 4rem) clamp(1.5rem, 3vw, 3rem); color:#fff8e8; background:radial-gradient(ellipse at 15% 10%,rgba(137,83,183,.42),transparent 42%),radial-gradient(ellipse at 90% 95%,rgba(193,151,69,.18),transparent 38%),linear-gradient(145deg,#17122f 0%,#241844 50%,#101b36 100%); }
+.royal-login-brand-panel:before { content:""; position:absolute; inset:14px; border:1px solid rgba(218,184,112,.27); border-radius:15px; pointer-events:none; z-index:-1; }
+.royal-emblem { width:78px; height:78px; display:grid; place-items:center; margin-bottom:1.4rem; border:1px solid rgba(226,194,125,.72); border-radius:24px 24px 24px 6px; color:#f0d18a; font-size:2.35rem; background:rgba(255,255,255,.055); box-shadow:0 0 34px rgba(220,177,91,.12); transform:rotate(-3deg); }
+.royal-eyebrow,.royal-kicker { font-size:.68rem; font-weight:800; letter-spacing:.2em; }
+.royal-eyebrow { color:#e3c47f; margin:0 0 .8rem; }
+.royal-login-brand-panel h1 { color:#fffaf0; font-size:clamp(2.2rem,4vw,3.25rem); font-weight:800; letter-spacing:-.06em; margin:0; }
+.royal-login-brand-panel h1 span { color:#e3c47f; }
+.royal-divider { display:flex; align-items:center; gap:12px; width:130px; margin:1.2rem 0; color:#e3c47f; }
+.royal-divider span { height:1px; flex:1; background:linear-gradient(90deg,transparent,#d8b66f); }
+.royal-divider span:last-child { transform:rotate(180deg); }
+.royal-brand-copy { max-width:260px; color:#d4cde2; font-size:.96rem; line-height:1.8; }
+.royal-security-note { display:flex; align-items:center; gap:.55rem; margin-top:2.2rem; color:#e8d9b5; font-size:.78rem; }
+.royal-security-note i { color:#e3c47f; font-size:1.05rem; }
+.royal-login-form-panel { padding:clamp(2rem,5vw,4.25rem) clamp(1.5rem,5vw,4rem); display:flex; flex-direction:column; justify-content:center; background:var(--tv-surface); }
+.royal-kicker { color:#a17b37; }
+.royal-form-heading h2 { margin:.6rem 0 .5rem; color:var(--tv-text); font-size:clamp(1.75rem,3vw,2.25rem); font-weight:800; letter-spacing:-.045em; }
+.royal-form-heading p { color:var(--tv-text-muted); margin-bottom:2rem; font-size:.92rem; }
+.royal-field .form-label { color:var(--tv-text); font-size:.84rem; font-weight:700; margin-bottom:.55rem; }
+.royal-input-group { border:1px solid var(--tv-border); border-radius:12px; overflow:hidden; transition:border-color .2s,box-shadow .2s; }
+.royal-input-group:focus-within { border-color:#b99a55; box-shadow:0 0 0 4px rgba(185,154,85,.15); }
+.royal-input-group .input-group-text,.royal-input-group .form-control { min-height:52px; border:0; border-radius:0; background:var(--tv-surface-2); color:var(--tv-text); box-shadow:none; }
+.royal-input-group .input-group-text { padding:0 1rem; color:#a17b37; }
+.royal-input-group .form-control::placeholder { color:var(--tv-text-muted); opacity:.8; }
+.royal-signin-btn { min-height:53px; display:flex; align-items:center; justify-content:center; gap:.6rem; border:1px solid #d7b66f; border-radius:12px; color:#fff9e9; background:linear-gradient(110deg,#282044,#44306b 58%,#30244c); box-shadow:0 9px 22px rgba(39,29,67,.2); letter-spacing:.015em; }
+.royal-signin-btn:hover,.royal-signin-btn:focus { color:#fff; border-color:#f0d797; background:linear-gradient(110deg,#332653,#594080 58%,#3b2c5c); box-shadow:0 12px 25px rgba(39,29,67,.25); }
+.royal-form-footer { text-align:center; margin-top:1.5rem; color:var(--tv-text-muted); font-size:.85rem; }
+.royal-form-footer a { color:#9b7738; font-weight:800; text-decoration:none; }
+.royal-form-footer a:hover { color:#6f4e1d; text-decoration:underline; }
+.royal-encryption { display:flex; justify-content:center; align-items:center; gap:.45rem; margin-top:2rem; padding-top:1.1rem; border-top:1px solid var(--tv-border); color:var(--tv-text-muted); font-size:.72rem; }
+.royal-encryption i { color:#b39450; }
+@keyframes royal-rise { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@media(max-width:700px) { .royal-login-shell { min-height:auto; padding:.25rem 0 1rem; } .royal-login-card { grid-template-columns:1fr; border-radius:19px; } .royal-login-brand-panel { padding:1.8rem 1.25rem; } .royal-emblem { width:58px; height:58px; border-radius:18px 18px 18px 5px; font-size:1.8rem; margin-bottom:.9rem; } .royal-login-brand-panel h1 { font-size:2.2rem; } .royal-brand-copy { margin-bottom:.25rem; } .royal-security-note { margin-top:.8rem; } .royal-login-form-panel { padding:2rem 1.4rem; } .royal-form-heading p { margin-bottom:1.4rem; } }
+@media(prefers-reduced-motion:reduce) { .royal-login-card { animation:none; } }
+
+/* Shared royal design system across TrustVault pages */
+:root { --tv-royal-ink:#17122f; --tv-royal-purple:#44306b; --tv-royal-gold:#e3c47f; }
+.navbar { background:linear-gradient(110deg,#17122f,#30244c 65%,#101b36) !important; border-bottom:1px solid rgba(227,196,127,.35); }
+.navbar-brand .text-primary, .navbar-brand i { color:var(--tv-royal-gold) !important; }
+.btn-primary { --bs-btn-bg:#44306b; --bs-btn-border-color:#b99a55; --bs-btn-hover-bg:#30244c; --bs-btn-hover-border-color:#e3c47f; --bs-btn-active-bg:#30244c; --bs-btn-active-border-color:#e3c47f; }
+[data-bs-theme="dark"] .btn-primary { --bs-btn-color:#fff9e9; --bs-btn-bg:#44306b; --bs-btn-border-color:#b99a55; --bs-btn-hover-bg:#594080; --bs-btn-hover-color:#fff; }
+.card, .table-responsive, .dropdown-menu, .modal-content { border-color:rgba(179,148,80,.28) !important; }
+.card-header { background:linear-gradient(110deg,rgba(36,24,68,.97),rgba(48,36,76,.94)) !important; color:#fff8e8 !important; }
+.card-header h1,.card-header h2,.card-header h3,.card-header h4,.card-header .text-dark { color:#fff8e8 !important; }
+.btn, .nav-link, .card, .form-control, .form-select, .dropdown-menu { transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease, background-color .22s ease; }
+.btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(39,29,67,.16); }
+.card { animation:royal-rise .42s ease both; }
+.alert { animation:royal-rise .35s ease both; border-left:4px solid #b39450; }
+.royal-register-card { max-width:1080px; }
+.royal-register-form-panel { padding-top:2.25rem; padding-bottom:2.25rem; }
+.royal-register-form-panel .royal-form-heading p { margin-bottom:1.3rem; }
+.royal-register-form-panel .royal-input-group .form-control,.royal-register-form-panel .royal-input-group .input-group-text { min-height:46px; }
+.royal-select { min-height:46px; border:1px solid var(--tv-border); background-color:var(--tv-surface-2); color:var(--tv-text); }
+.royal-select:focus { border-color:#b99a55; box-shadow:0 0 0 4px rgba(185,154,85,.15); }
+.royal-help { color:var(--tv-text-muted); font-size:.76rem; line-height:1.5; margin:.45rem 0 0; }
+.royal-help i { color:#a17b37; }
+.royal-signin-btn i { transition:transform .2s ease; }
+.royal-signin-btn:hover i { transform:translateX(4px); }
+.navbar .nav-link.active { color:#f0d18a !important; background:rgba(227,196,127,.1); }
+.btn-floating, .floating-action { box-shadow:0 10px 26px rgba(39,29,67,.22); animation:royal-float 4s ease-in-out infinite; }
+@keyframes royal-float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-4px); } }
+@media(max-width:700px) { .royal-register-form-panel { padding:1.6rem 1.2rem; } }
+@media(prefers-reduced-motion:reduce) { .btn-floating,.floating-action { animation:none; } }
